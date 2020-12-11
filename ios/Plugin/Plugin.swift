@@ -8,10 +8,15 @@ import Capacitor
 @objc(PJAMMBackground)
 public class PJAMMBackground: CAPPlugin {
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.success([
-            "value": value
-        ])
+    @objc func enableBackgroundFetch(_ call: CAPPluginCall) {
+
+    }
+
+    @objc func disableBackgroundFetch(_ call: CAPPluginCall) {
+
+    }
+
+    @objc func sendBackgroundExitData(_ call: CAPPluginCall) {
+
     }
 }

@@ -9,9 +9,19 @@ export class PJAMMBackgroundWeb extends WebPlugin implements PJAMMBackgroundPlug
     });
   }
 
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  enableBackgroundFetch() {
+    //Do Nothing
+    return;
+  }
+
+  disableBackgroundFetch() {
+    //Do Nothing
+    return;
+  }
+
+  sendBackgroundExitData() {
+    //Do Nothing
+    return;
   }
 }
 
