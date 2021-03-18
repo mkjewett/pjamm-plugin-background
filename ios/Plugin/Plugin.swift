@@ -10,8 +10,12 @@ import MetricKit
 public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
     
     @objc public override func load() {
-        let metricManager = MXMetricManager.shared
-        metricManager.add(self)
+        if #available(iOS 14.0, *) {
+            let metricManager = MXMetricManager.shared
+            metricManager.add(self)
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     @objc func enableBackgroundFetch(_ call: CAPPluginCall) {
@@ -26,8 +30,9 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
 
     }
     
+    @available(iOS 13.0, *)
     @objc public func didReceive(_ payloads: [MXMetricPayload]) {
-        let exitCounts:[String:Int32] = [
+        var exitCounts:[String:Int] = [
             "abnormalExit": 0,
             "appWatchdog": 0,
             "badAccess": 0,
@@ -41,17 +46,23 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
         ]
         
         for payload in payloads {
-            if let exitData = payload.applicationExitMetrics?.backgroundExitData {
-                exitCounts["abnormalExit"] += exitData.cumulativeAbnormalExitCount
-                exitCounts["appWatchdog"] += exitData.cumulativeAppWatchdogExitCount
-                exitCounts["badAccess"] += exitData.cumulativeBadAccessExitCount
-                exitCounts["backgroundTaskTimeout"] += exitData.cumulativeBackgroundTaskAssertionTimeoutExitCount
-                exitCounts["cpuResourceLimit"] += exitData.cumulativeCPUResourceLimitExitCount
-                exitCounts["illegalInstructions"] += exitData.cumulativeIllegalInstructionExitCount
-                exitCounts["memoryPressureExit"] += exitData.cumulativeMemoryPressureExitCount
-                exitCounts["memoryResourceLimit"] += exitData.cumulativeMemoryResourceLimitExitCount
-                exitCounts["normalExit"] += exitData.cumulativeNormalAppExitCount
-                exitCounts["suspendedWithLockedFile"] += exitData.cumulativeSuspendedWithLockedFileExitCount
+            if #available(iOS 14.0, *) {
+                if let exitData = payload.applicationExitMetrics?.backgroundExitData {
+                    
+                    exitCounts["abnormalExit"]! += exitData.cumulativeAbnormalExitCount
+                    exitCounts["appWatchdog"]! += exitData.cumulativeAppWatchdogExitCount
+                    exitCounts["badAccess"]! += exitData.cumulativeBadAccessExitCount
+                    exitCounts["backgroundTaskTimeout"]! += exitData.cumulativeBackgroundTaskAssertionTimeoutExitCount
+                    exitCounts["cpuResourceLimit"]! += exitData.cumulativeCPUResourceLimitExitCount
+                    exitCounts["illegalInstructions"]! += exitData.cumulativeIllegalInstructionExitCount
+                    exitCounts["memoryPressureExit"]! += exitData.cumulativeMemoryPressureExitCount
+                    exitCounts["memoryResourceLimit"]! += exitData.cumulativeMemoryResourceLimitExitCount
+                    exitCounts["normalExit"]! += exitData.cumulativeNormalAppExitCount
+                    exitCounts["suspendedWithLockedFile"]! += exitData.cumulativeSuspendedWithLockedFileExitCount
+                    
+                }
+            } else {
+                // Fallback on earlier versions
             }
         }
         
