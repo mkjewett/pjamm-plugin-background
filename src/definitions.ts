@@ -7,5 +7,5 @@ declare module '@capacitor/core' {
 export interface PJAMMBackgroundPlugin {
   enableBackgroundFetch():void;
   disableBackgroundFetch():void;
-  sendBackgroundExitData():void;
+  sendBackgroundExitData():Promise<any>
 }

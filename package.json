@@ -1,6 +1,6 @@
 {
   "name": "pjamm-plugin-background",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Background Service Plugin",
   "main": "dist/plugin.js",
   "module": "dist/esm/index.js",

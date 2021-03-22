@@ -27,20 +27,18 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
     }
 
     @objc func sendBackgroundExitData(_ call: CAPPluginCall) {
+
+        var payloads:Array<[String:Any]> = []
+
         if #available(iOS 14.0, *) {
             let metricManager = MXMetricManager.shared
-            var payloads:Array<Any> = [];
             
             for payload in metricManager.pastPayloads {
-                if let exitData = payload.applicationExitMetrics?.backgroundExitData {
-                    payloads.append(exitData.)
-                }
+                payloads.append(convertPayloadToJSON(payload: payload))
             }
-            
-            call.resolve(["payloads": metricManager.pastPayloads.])
-        } else {
-            // Fallback on earlier versions
         }
+
+        call.resolve(["payloads": payloads])
     }
     
     @available(iOS 13.0, *)
