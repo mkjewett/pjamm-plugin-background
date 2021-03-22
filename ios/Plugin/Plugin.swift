@@ -55,7 +55,7 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
     
     @available(iOS 13.0, *)
     @objc private func convertPayloadToJSON (payload:MXMetricPayload) -> [String:Any] {
-        var payloadData:[String:Any]
+        var payloadData:[String:Any] = [:]
         var exitCounts:Array<[String:Any]> = []
         
         if #available(iOS 14.0, *) {
