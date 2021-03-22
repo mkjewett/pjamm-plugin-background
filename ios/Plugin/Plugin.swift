@@ -27,46 +27,72 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
     }
 
     @objc func sendBackgroundExitData(_ call: CAPPluginCall) {
-
+        if #available(iOS 14.0, *) {
+            let metricManager = MXMetricManager.shared
+            var payloads:Array<Any> = [];
+            
+            for payload in metricManager.pastPayloads {
+                if let exitData = payload.applicationExitMetrics?.backgroundExitData {
+                    payloads.append(exitData.)
+                }
+            }
+            
+            call.resolve(["payloads": metricManager.pastPayloads.])
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     @available(iOS 13.0, *)
     @objc public func didReceive(_ payloads: [MXMetricPayload]) {
-        var exitCounts:[String:Int] = [
-            "abnormalExit": 0,
-            "appWatchdog": 0,
-            "badAccess": 0,
-            "backgroundTaskTimeout": 0,
-            "cpuResourceLimit": 0,
-            "illegalInstructions": 0,
-            "memoryPressureExit": 0,
-            "memoryResourceLimit": 0,
-            "normalExit": 0,
-            "suspendedWithLockedFile": 0
-        ]
+        
+        var payloadData:Array<[String:Any]> = []
         
         for payload in payloads {
-            if #available(iOS 14.0, *) {
-                if let exitData = payload.applicationExitMetrics?.backgroundExitData {
-                    
-                    exitCounts["abnormalExit"]! += exitData.cumulativeAbnormalExitCount
-                    exitCounts["appWatchdog"]! += exitData.cumulativeAppWatchdogExitCount
-                    exitCounts["badAccess"]! += exitData.cumulativeBadAccessExitCount
-                    exitCounts["backgroundTaskTimeout"]! += exitData.cumulativeBackgroundTaskAssertionTimeoutExitCount
-                    exitCounts["cpuResourceLimit"]! += exitData.cumulativeCPUResourceLimitExitCount
-                    exitCounts["illegalInstructions"]! += exitData.cumulativeIllegalInstructionExitCount
-                    exitCounts["memoryPressureExit"]! += exitData.cumulativeMemoryPressureExitCount
-                    exitCounts["memoryResourceLimit"]! += exitData.cumulativeMemoryResourceLimitExitCount
-                    exitCounts["normalExit"]! += exitData.cumulativeNormalAppExitCount
-                    exitCounts["suspendedWithLockedFile"]! += exitData.cumulativeSuspendedWithLockedFileExitCount
-                    
-                }
-            } else {
-                // Fallback on earlier versions
+            payloadData.append(convertPayloadToJSON(payload: payload))
+        }
+        
+        self.notifyListeners("pjammExitData", data: ["payloads": payloadData])
+    }
+    
+    @available(iOS 13.0, *)
+    @objc private func convertPayloadToJSON (payload:MXMetricPayload) -> [String:Any] {
+        var payloadData:[String:Any]
+        var exitCounts:Array<[String:Any]> = []
+        
+        if #available(iOS 14.0, *) {
+            if let exitData = payload.applicationExitMetrics?.backgroundExitData {
+                
+                exitCounts.append(["name":"abnormalExit","count":exitData.cumulativeAbnormalExitCount]);
+                exitCounts.append(["name":"appWatchdog","count":exitData.cumulativeAppWatchdogExitCount]);
+                exitCounts.append(["name":"badAccess","count":exitData.cumulativeBadAccessExitCount]);
+                exitCounts.append(["name":"backgroundTaskTimeout","count":exitData.cumulativeBackgroundTaskAssertionTimeoutExitCount]);
+                exitCounts.append(["name":"cpuResourceLimit","count":exitData.cumulativeCPUResourceLimitExitCount]);
+                exitCounts.append(["name":"illegalInstructions","count":exitData.cumulativeIllegalInstructionExitCount]);
+                exitCounts.append(["name":"memoryPressureExit","count":exitData.cumulativeMemoryPressureExitCount]);
+                exitCounts.append(["name":"memoryResourceLimit","count":exitData.cumulativeMemoryResourceLimitExitCount]);
+                exitCounts.append(["name":"normalExit","count":exitData.cumulativeNormalAppExitCount]);
+                exitCounts.append(["name":"suspendedWithLockedFile","count":exitData.cumulativeSuspendedWithLockedFileExitCount]);
+                
+                // exitCounts["abnormalExit"]! += exitData.cumulativeAbnormalExitCount
+                // exitCounts["appWatchdog"]! += exitData.cumulativeAppWatchdogExitCount
+                // exitCounts["badAccess"]! += exitData.cumulativeBadAccessExitCount
+                // exitCounts["backgroundTaskTimeout"]! += exitData.cumulativeBackgroundTaskAssertionTimeoutExitCount
+                // exitCounts["cpuResourceLimit"]! += exitData.cumulativeCPUResourceLimitExitCount
+                // exitCounts["illegalInstructions"]! += exitData.cumulativeIllegalInstructionExitCount
+                // exitCounts["memoryPressureExit"]! += exitData.cumulativeMemoryPressureExitCount
+                // exitCounts["memoryResourceLimit"]! += exitData.cumulativeMemoryResourceLimitExitCount
+                // exitCounts["normalExit"]! += exitData.cumulativeNormalAppExitCount
+                // exitCounts["suspendedWithLockedFile"]! += exitData.cumulativeSuspendedWithLockedFileExitCount
+                
             }
         }
         
-        self.notifyListeners("pjammExitData", data: exitCounts);
+        payloadData["beginTime"]    = payload.timeStampBegin.timeIntervalSince1970
+        payloadData["endTime"]      = payload.timeStampEnd.timeIntervalSince1970
+        payloadData["exitCounts"]   = exitCounts
+        
+        return payloadData
     }
     
 }
