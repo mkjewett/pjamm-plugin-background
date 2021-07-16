@@ -1,14 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
-import { PJAMMBackgroundPlugin } from './definitions';
+
+import type { PJAMMBackgroundPlugin } from './definitions';
 
 export class PJAMMBackgroundWeb extends WebPlugin implements PJAMMBackgroundPlugin {
-  constructor() {
-    super({
-      name: 'PJAMMBackground',
-      platforms: ['web'],
-    });
-  }
-
   enableBackgroundFetch() {
     //Do Nothing
     return;
@@ -23,10 +17,3 @@ export class PJAMMBackgroundWeb extends WebPlugin implements PJAMMBackgroundPlug
     return Promise.resolve(null);
   }
 }
-
-const PJAMMBackground = new PJAMMBackgroundWeb();
-
-export { PJAMMBackground };
-
-import { registerWebPlugin } from '@capacitor/core';
-registerWebPlugin(PJAMMBackground);

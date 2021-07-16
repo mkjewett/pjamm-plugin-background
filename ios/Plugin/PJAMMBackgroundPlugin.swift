@@ -6,9 +6,10 @@ import MetricKit
  * Please read the Capacitor iOS Plugin Development Guide
  * here: https://capacitorjs.com/docs/plugins/ios
  */
-@objc(PJAMMBackground)
-public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
-    
+@objc(PJAMMBackgroundPlugin)
+public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
+    private let implementation = PJAMMBackground()
+
     @objc public override func load() {
         if #available(iOS 14.0, *) {
             let metricManager = MXMetricManager.shared
@@ -19,11 +20,9 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
     }
 
     @objc func enableBackgroundFetch(_ call: CAPPluginCall) {
-
     }
 
     @objc func disableBackgroundFetch(_ call: CAPPluginCall) {
-
     }
 
     @objc func sendBackgroundExitData(_ call: CAPPluginCall) {
@@ -92,5 +91,4 @@ public class PJAMMBackground: CAPPlugin, MXMetricManagerSubscriber {
         
         return payloadData
     }
-    
 }
