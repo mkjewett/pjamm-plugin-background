@@ -7,4 +7,5 @@ CAP_PLUGIN(PJAMMBackgroundPlugin, "PJAMMBackground",
             CAP_PLUGIN_METHOD(enableBackgroundFetch, CAPPluginReturnNone);
             CAP_PLUGIN_METHOD(disableBackgroundFetch, CAPPluginReturnNone);
             CAP_PLUGIN_METHOD(sendBackgroundExitData, CAPPluginReturnPromise);
+            CAP_PLUGIN_METHOD(sendBatteryData, CAPPluginReturnPromise);
 )

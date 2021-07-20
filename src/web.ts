@@ -16,4 +16,8 @@ export class PJAMMBackgroundWeb extends WebPlugin implements PJAMMBackgroundPlug
   sendBackgroundExitData():Promise<any> {
     return Promise.resolve(null);
   }
+
+  sendBatteryData():Promise<any> {
+    return Promise.resolve(null);
+  }
 }
