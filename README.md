@@ -16,6 +16,7 @@ npx cap sync
 * [`enableBackgroundFetch()`](#enablebackgroundfetch)
 * [`disableBackgroundFetch()`](#disablebackgroundfetch)
 * [`sendBackgroundExitData()`](#sendbackgroundexitdata)
+* [`sendBatteryData()`](#sendbatterydata)
 
 </docgen-index>
 
@@ -44,6 +45,17 @@ disableBackgroundFetch() => void
 
 ```typescript
 sendBackgroundExitData() => any
+```
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### sendBatteryData()
+
+```typescript
+sendBatteryData() => any
 ```
 
 **Returns:** <code>any</code>
