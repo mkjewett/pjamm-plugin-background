@@ -177,9 +177,10 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
     @objc private func convertBatteryDataToJSON (data:BatteryData?) -> [String:Any] {
         
         var batteryData:[String:Any] = [:]
+        let time:Double = data?.timestamp ?? 0 * 1000
         
         batteryData["level"] = data?.level ?? 0
-        batteryData["timestamp"] = data?.timestamp ?? 0
+        batteryData["timestamp"] = time.rounded()
         batteryData["burnRate_overall"] = data?.burnRate_overall ?? 0
         batteryData["burnRate_15mins"] = data?.burnRate_15mins ?? 0
         
