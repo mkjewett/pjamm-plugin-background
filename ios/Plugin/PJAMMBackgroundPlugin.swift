@@ -21,10 +21,9 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
             // Fallback on earlier versions
         }
         
-        
         // Battery Monitoring
         UIDevice.current.isBatteryMonitoringEnabled = true
-        NotificationCenter.default.addObserver(self, selector: #selector(batteryLevelDidChange), name: UIDevice.batteryLevelDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.batteryLevelDidChange(notification:)), name: UIDevice.batteryLevelDidChangeNotification, object: nil)
     }
 
     @objc func enableBackgroundFetch(_ call: CAPPluginCall) {
@@ -94,10 +93,12 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         return payloadData
     }
     
-    @objc public func batteryLevelDidChange(_ notification: Notification){
+    @objc public func batteryLevelDidChange(notification: Notification){
         let preBatteryData = self.curBatteryData
         self.curBatteryData = BatteryData()
         
+        self.curBatteryData?.burnRate_15mins  = 0;
+        self.curBatteryData?.burnRate_overall = 0;
         
         if self.curBatteryData?.state == UIDevice.BatteryState.unplugged {
             
@@ -113,38 +114,40 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         } else {
             
             self.initBatteryData_unplugged = nil
-            self.curBatteryData?.burnRate_15mins = preBatteryData!.burnRate_15mins
-            self.curBatteryData?.burnRate_overall = preBatteryData!.burnRate_overall
+            self.curBatteryData?.burnRate_15mins = preBatteryData?.burnRate_15mins ?? 0
+            self.curBatteryData?.burnRate_overall = preBatteryData?.burnRate_overall ?? 0
             
         }
-        
-        self.notifyListeners("pjammBatteryData", data: ["data": convertBatteryDataToJSON(data: self.curBatteryData!)])
+                
+        self.notifyListeners("pjammBatteryData", data: convertBatteryDataToJSON(data: self.curBatteryData))
     }
     
     @objc private func updateCurBatteryDataBurnRates(){
         
-        if self.curBatteryData?.state != UIDevice.BatteryState.unplugged {
+        let timeTarget:Float = 15 * 60.0;
+        
+        if self.curBatteryData == nil || self.curBatteryData?.state != UIDevice.BatteryState.unplugged {
             return
         }
         
         // Update Overall Burn Rate
-        if self.initBatteryData_unplugged != nil {
-            self.curBatteryData!.burnRate_overall = (self.initBatteryData_unplugged!.level - self.curBatteryData!.level) / (self.initBatteryData_unplugged!.timestamp - self.curBatteryData!.timestamp)
+        if self.initBatteryData_unplugged != nil && self.curBatteryData?.timestamp != self.initBatteryData_unplugged?.timestamp {
+            self.curBatteryData?.burnRate_overall = (self.initBatteryData_unplugged!.level - self.curBatteryData!.level) / Float(self.curBatteryData!.timestamp - self.initBatteryData_unplugged!.timestamp)
             
-            self.curBatteryData!.burnRate_overall *= 100 // % per sec
-            self.curBatteryData!.burnRate_overall *= 3600 // % per hour
+            self.curBatteryData?.burnRate_overall *= 100 // % per sec
+            self.curBatteryData?.burnRate_overall *= 3600 // % per hour
         }
         
         //Update 15 min Burn Rate
         if self.burnRateData_15mins.count > 1 {
-            let curLevel:Float      = self.burnRateData_15mins[0].level
-            var startLevel:Float    = self.burnRateData_15mins[0].level
+            let levelNow:Float      = self.burnRateData_15mins[0].level
+            var levelStart:Float    = self.burnRateData_15mins[0].level
             var time:Float          = 0;
             
             for i in 1..<self.burnRateData_15mins.count {
                 let curData = self.burnRateData_15mins[i - 1]
                 let preData = self.burnRateData_15mins[i]
-                let duration = curData.timestamp - preData.timestamp
+                let duration = Float(curData.timestamp - preData.timestamp)
                 
                 if curData.level > preData.level {
                     self.burnRateData_15mins = Array(self.burnRateData_15mins[0..<i])
@@ -152,32 +155,35 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
                 }
                 
                 time += duration
-                startLevel = preData.level
+                levelStart = preData.level
                 
-                if time > 15 * 60 {
+                if time > timeTarget {
+                    let excessTime:Float = time - timeTarget;
+                    
+                    time = timeTarget;
+                    levelStart = curData.level + (preData.level - curData.level)*(duration - excessTime)/duration
+                    
                     self.burnRateData_15mins = Array(self.burnRateData_15mins[0...i])
                     break;
                 }
             }
             
             if time > 0 {
-                self.curBatteryData?.burnRate_15mins = 3600 * 100 * (startLevel - curLevel) / time // % per hour
+                self.curBatteryData?.burnRate_15mins = 3600 * 100 * (levelStart - levelNow) / time // % per hour
             }
         }
     }
     
-    @objc private func convertBatteryDataToJSON (data:BatteryData) -> [String:Any] {
-        var batteryData:[String:Any] = [
-            "level":0,
-            "burnRate_overall":0,
-            "burnRate_15mins":0
-        ]
+    @objc private func convertBatteryDataToJSON (data:BatteryData?) -> [String:Any] {
         
-        batteryData["level"]            = self.curBatteryData?.level
-        batteryData["burnRate_overall"] = self.curBatteryData?.burnRate_overall
-        batteryData["burnRate_15mins"]  = self.curBatteryData?.burnRate_15mins
+        var batteryData:[String:Any] = [:]
         
-        if self.curBatteryData?.state == UIDevice.BatteryState.charging || self.curBatteryData?.state == UIDevice.BatteryState.full {
+        batteryData["level"] = data?.level ?? 0
+        batteryData["timestamp"] = data?.timestamp ?? 0
+        batteryData["burnRate_overall"] = data?.burnRate_overall ?? 0
+        batteryData["burnRate_15mins"] = data?.burnRate_15mins ?? 0
+        
+        if data?.state == UIDevice.BatteryState.charging || data?.state == UIDevice.BatteryState.full {
             batteryData["isCharging"] = true
         } else {
             batteryData["isCharging"] = false
@@ -188,7 +194,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
 }
 
 @objc public class BatteryData: NSObject {
-    var timestamp:Float
+    var timestamp:Double
     var level:Float
     var state:UIDevice.BatteryState
     
@@ -196,7 +202,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
     var burnRate_overall:Float = 0
     
     public override init() {
-        self.timestamp  = Float(NSDate().timeIntervalSince1970)
+        self.timestamp  = NSDate().timeIntervalSince1970
         self.level      = UIDevice.current.batteryLevel
         self.state      = UIDevice.current.batteryState
     }
