@@ -13,15 +13,56 @@ npx cap sync
 
 <docgen-index>
 
+* [`taskBeforeExit(...)`](#taskbeforeexit)
+* [`taskFinish(...)`](#taskfinish)
+* [`enableBackgroundFetch()`](#enablebackgroundfetch)
 * [`enableBackgroundFetch()`](#enablebackgroundfetch)
 * [`disableBackgroundFetch()`](#disablebackgroundfetch)
 * [`sendBackgroundExitData()`](#sendbackgroundexitdata)
 * [`sendBatteryData()`](#sendbatterydata)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
+
+### taskBeforeExit(...)
+
+```typescript
+taskBeforeExit(cb: () => void) => any
+```
+
+| Param    | Type                       |
+| -------- | -------------------------- |
+| **`cb`** | <code>() =&gt; void</code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### taskFinish(...)
+
+```typescript
+taskFinish(options: FinishOptions) => void
+```
+
+| Param         | Type                                                    |
+| ------------- | ------------------------------------------------------- |
+| **`options`** | <code><a href="#finishoptions">FinishOptions</a></code> |
+
+--------------------
+
+
+### enableBackgroundFetch()
+
+```typescript
+enableBackgroundFetch() => void
+```
+
+--------------------
+
 
 ### enableBackgroundFetch()
 
@@ -61,5 +102,15 @@ sendBatteryData() => any
 **Returns:** <code>any</code>
 
 --------------------
+
+
+### Interfaces
+
+
+#### FinishOptions
+
+| Prop         | Type                |
+| ------------ | ------------------- |
+| **`taskId`** | <code>string</code> |
 
 </docgen-api>
