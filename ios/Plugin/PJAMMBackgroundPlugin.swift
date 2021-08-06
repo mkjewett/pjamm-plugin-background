@@ -26,14 +26,27 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         UIDevice.current.isBatteryMonitoringEnabled = true
         NotificationCenter.default.addObserver(self, selector: #selector(self.batteryLevelDidChange(notification:)), name: UIDevice.batteryLevelDidChangeNotification, object: nil)
     }
-
-    @objc func enableBackgroundFetch(_ call: CAPPluginCall) {
+    
+    @objc public func taskBeforeExit(_ call: CAPPluginCall) {
+        implementation.taskBeforeExit(call.callbackId)
+        call.resolve()
     }
 
-    @objc func disableBackgroundFetch(_ call: CAPPluginCall) {
+    @objc public func taskFinish(_ call: CAPPluginCall) {
+        guard let callbackId = call.getString("taskId") else {
+            call.reject("No taskId was provided.")
+            return
+        }
+        implementation.taskFinish(callbackId)
     }
 
-    @objc func sendBackgroundExitData(_ call: CAPPluginCall) {
+    @objc public func enableBackgroundFetch(_ call: CAPPluginCall) {
+    }
+
+    @objc public func disableBackgroundFetch(_ call: CAPPluginCall) {
+    }
+
+    @objc public func sendBackgroundExitData(_ call: CAPPluginCall) {
 
         var payloads:Array<[String:Any]> = []
 
@@ -48,7 +61,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         call.resolve(["payloads": payloads])
     }
     
-    @objc func sendBatteryData(_ call: CAPPluginCall) {
+    @objc public func sendBatteryData(_ call: CAPPluginCall) {
         let batteryData = convertBatteryDataToJSON(data: self.curBatteryData ?? BatteryData())
         
         call.resolve(batteryData)
@@ -240,5 +253,3 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         }
     }
 }
-
-
