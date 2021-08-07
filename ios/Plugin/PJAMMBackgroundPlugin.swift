@@ -13,6 +13,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
     private var initBatteryData_unplugged:BatteryData? = nil
     private var burnRateItem_15mins:BurnRateItem = BurnRateItem(timeTarget: 15*60)
     private var burnRateItem_30mins:BurnRateItem = BurnRateItem(timeTarget: 30*60)
+    private var taskIds: [String: UIBackgroundTaskIdentifier] = [:]
 
     @objc public override func load() {
         if #available(iOS 14.0, *) {
@@ -28,7 +29,18 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
     }
     
     @objc public func taskBeforeExit(_ call: CAPPluginCall) {
-        implementation.taskBeforeExit(call.callbackId)
+        DispatchQueue.main.async { [weak self] in
+            
+            guard let self = self else { return }
+            
+            var taskId = UIBackgroundTaskIdentifier.invalid
+            taskId = UIApplication.shared.beginBackgroundTask {
+                // Finish the task if time expires.
+                UIApplication.shared.endBackgroundTask(taskId)
+                self.taskIds.removeValue(forKey: callbackId)
+            }
+            self.taskIds[callbackId] = taskId
+        }
         call.resolve()
     }
 
@@ -37,7 +49,18 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
             call.reject("No taskId was provided.")
             return
         }
-        implementation.taskFinish(callbackId)
+
+        DispatchQueue.main.async { [weak self] in
+            
+            guard let self = self else { return }
+            
+            guard let taskId = self.taskIds[callbackId] else {
+                return
+            }
+            
+            UIApplication.shared.endBackgroundTask(taskId)
+            self.taskIds.removeValue(forKey: callbackId)
+        }
     }
 
     @objc public func enableBackgroundFetch(_ call: CAPPluginCall) {
