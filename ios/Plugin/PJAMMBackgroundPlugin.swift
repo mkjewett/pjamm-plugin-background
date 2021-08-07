@@ -29,6 +29,12 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
     }
     
     @objc public func taskBeforeExit(_ call: CAPPluginCall) {
+        
+        guard let callbackId = call.callbackId else {
+            call.reject("No allbackId was provided.")
+            return
+        }
+        
         DispatchQueue.main.async { [weak self] in
             
             guard let self = self else { return }
@@ -41,6 +47,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
             }
             self.taskIds[callbackId] = taskId
         }
+        
         call.resolve()
     }
 
