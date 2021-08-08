@@ -1,9 +1,9 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CallBackID, FinishOptions, PJAMMBackgroundPlugin } from './definitions';
+import type { FinishOptions, PJAMMBackgroundPlugin } from './definitions';
 
 export class PJAMMBackgroundWeb extends WebPlugin implements PJAMMBackgroundPlugin {
-  taskBeforeExit(_cb: ()=>void):Promise<CallBackID> {
+  taskBeforeExit():Promise<any> {
     throw this.unimplemented('Not implemented on web.');
   }
 

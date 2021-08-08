@@ -1,9 +1,7 @@
 import { WebPlugin } from "@capacitor/core";
 
-export type CallBackID = string;
-
 export interface PJAMMBackgroundPlugin extends WebPlugin {
-  taskBeforeExit(cb: ()=>void):Promise<CallBackID>;
+  taskBeforeExit():Promise<any>;
   taskFinish(options: FinishOptions): void;
   enableBackgroundFetch():void;
   enableBackgroundFetch():void;
@@ -13,5 +11,5 @@ export interface PJAMMBackgroundPlugin extends WebPlugin {
 }
 
 export interface FinishOptions {
-  taskId: CallBackID
+  taskId: string
 }

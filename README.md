@@ -13,7 +13,7 @@ npx cap sync
 
 <docgen-index>
 
-* [`taskBeforeExit(...)`](#taskbeforeexit)
+* [`taskBeforeExit()`](#taskbeforeexit)
 * [`taskFinish(...)`](#taskfinish)
 * [`enableBackgroundFetch()`](#enablebackgroundfetch)
 * [`enableBackgroundFetch()`](#enablebackgroundfetch)
@@ -27,15 +27,11 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### taskBeforeExit(...)
+### taskBeforeExit()
 
 ```typescript
-taskBeforeExit(cb: () => void) => any
+taskBeforeExit() => any
 ```
-
-| Param    | Type                       |
-| -------- | -------------------------- |
-| **`cb`** | <code>() =&gt; void</code> |
 
 **Returns:** <code>any</code>
 
