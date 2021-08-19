@@ -45,6 +45,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
                 UIApplication.shared.endBackgroundTask(taskId)
                 self.taskIds.removeValue(forKey: callbackId)
             }
+            
             self.taskIds[callbackId] = taskId
         }
 
@@ -146,7 +147,9 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         
         if self.curBatteryData?.state == UIDevice.BatteryState.unplugged {
             
-            if self.initBatteryData_unplugged == nil {
+            let levelIncrease:Bool = (self.curBatteryData?.level ?? 0) > (self.initBatteryData_unplugged?.level ?? 0)
+            
+            if self.initBatteryData_unplugged == nil || levelIncrease {
                 self.initBatteryData_unplugged = self.curBatteryData
                 self.burnRateItem_15mins.clearData()
                 self.burnRateItem_30mins.clearData()
