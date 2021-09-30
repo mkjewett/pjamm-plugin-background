@@ -270,7 +270,7 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
             levelStart = preData.level
             
             if time > self.timeTarget {
-                let excessTime:Float = self.timeTarget
+                let excessTime:Float = (time - self.timeTarget)
                 
                 time = self.timeTarget;
                 levelStart = curData.level + (preData.level - curData.level)*(duration - excessTime)/duration
