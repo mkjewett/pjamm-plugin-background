@@ -30,10 +30,10 @@ npx cap sync
 ### taskBeforeExit()
 
 ```typescript
-taskBeforeExit() => any
+taskBeforeExit() => Promise<any>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
@@ -81,10 +81,10 @@ disableBackgroundFetch() => void
 ### sendBackgroundExitData()
 
 ```typescript
-sendBackgroundExitData() => any
+sendBackgroundExitData() => Promise<any>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
@@ -92,10 +92,10 @@ sendBackgroundExitData() => any
 ### sendBatteryData()
 
 ```typescript
-sendBatteryData() => any
+sendBatteryData() => Promise<any>
 ```
 
-**Returns:** <code>any</code>
+**Returns:** <code>Promise&lt;any&gt;</code>
 
 --------------------
 
