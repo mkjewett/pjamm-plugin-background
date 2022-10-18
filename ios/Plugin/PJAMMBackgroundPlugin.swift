@@ -26,6 +26,9 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         // Battery Monitoring
         UIDevice.current.isBatteryMonitoringEnabled = true
         NotificationCenter.default.addObserver(self, selector: #selector(self.batteryLevelDidChange(notification:)), name: UIDevice.batteryLevelDidChangeNotification, object: nil)
+        
+        // Low Memory
+        NotificationCenter.default.addObserver(self, selector: #selector(self.lowMemoryWarningRecieved(notification:)), name: UIApplication.didReceiveMemoryWarningNotification, object: nil)
     }
     
     @objc public func taskBeforeExit(_ call: CAPPluginCall) {
@@ -89,6 +92,10 @@ public class PJAMMBackgroundPlugin: CAPPlugin, MXMetricManagerSubscriber {
         }
 
         call.resolve(["payloads": payloads])
+    }
+    
+    @objc public func lowMemoryWarningRecieved(notification: Notification){
+        self.notifyListeners("pjammLowMemory", data: ["message": "low memory warning recieved"])
     }
     
     @objc public func sendBatteryData(_ call: CAPPluginCall) {
